@@ -41,7 +41,7 @@ function MainList() {
   }
 
   function doneClick(id: number) {
-    var item = itemList.find((p) => p.id == id);
+    var item = itemList.find((p) => p.id === id);
     if (item != null) {
       item.done = !item.done;
       const reqop = {
