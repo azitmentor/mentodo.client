@@ -89,6 +89,15 @@ function MainList() {
         Add new item
       </button>
       <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>State</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th></th>
+          </tr>
+        </thead>
         <tbody>
           {itemList.map((p) => {
             return (
