@@ -7,12 +7,14 @@ function MainList() {
   const [priority, setPriority] = useState("");
   const [searchText, setSearchText] = useState("");
 
+  const APIURL = "http://todoapi.azitmentor.hu/";
+
   useEffect(() => {
     refresh();
   }, []);
 
   function refresh() {
-    fetch("http://todoapi.azitmentor.hu/todo")
+    fetch(APIURL + "todo")
       .then((p) => p.json())
       .then((k: mydto[]) => {
         k = k.filter((p) => p.info.indexOf(searchText) !== -1);
@@ -26,18 +28,14 @@ function MainList() {
       body: JSON.stringify({ info: textInfo, priority: priority }),
       headers: { "Content-Type": "application/json" },
     };
-    fetch("http://todoapi.azitmentor.hu/todo/save", requestOptions).then((p) =>
-      refresh()
-    );
+    fetch(APIURL + "todo/save", requestOptions).then((p) => refresh());
   }
 
   function deleteItem(id: number) {
     const requestOptions = {
       method: "DELETE",
     };
-    fetch("http://todoapi.azitmentor.hu/todo/" + id, requestOptions).then((p) =>
-      refresh()
-    );
+    fetch(APIURL + "todo/" + id, requestOptions).then((p) => refresh());
   }
 
   function doneClick(id: number) {
@@ -49,9 +47,7 @@ function MainList() {
         body: JSON.stringify(item),
         headers: { "Content-Type": "application/json" },
       };
-      fetch("http://todoapi.azitmentor.hu/todo/save", reqop).then((p) =>
-        refresh()
-      );
+      fetch(APIURL + "todo/save", reqop).then((p) => refresh());
     }
   }
   return (
