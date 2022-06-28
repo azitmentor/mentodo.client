@@ -2,7 +2,8 @@
 import { ref, onMounted, toRaw } from 'vue'
 import type { mydto } from './myclass';
 
-// reactive state
+const APIURL = "http://todoapi.azitmentor.hu/";
+
 const data = ref<mydto[]>([]);
 
 const searchtext = ref("");
@@ -11,49 +12,45 @@ const newText = ref("");
 
 const selected = ref("");
 
-const actualItem = ref<mydto>();
-
 function search() {
   refresh();
 }
 
-// lifecycle hooks
 onMounted(() => {
   refresh();
 })
 
 function refresh() {
-  fetch("http://todoapi.azitmentor.hu/todo").then(p => p.json()).then(k => {
+  fetch(APIURL + "todo").then(p => p.json()).then(k => {
     data.value = k.filter((p: mydto) => p.info == null || p.info.indexOf(searchtext.value) !== -1)
   });
 }
 
 function addNew() {
-  const reqop = {
+  const requestOptions = {
     method: "POST",
     body: JSON.stringify({ info: newText.value, priority: selected.value }),
     headers: { "Content-Type": "application/json" },
   };
-  fetch("http://todoapi.azitmentor.hu/todo/save", reqop).then(p => refresh());
+  fetch(APIURL + "todo/save", requestOptions).then(p => refresh());
 }
 
 function deleteItem(id: number) {
-  const reqop = {
+  const requestOptions = {
     method: "DELETE"
   };
-  fetch("http://todoapi.azitmentor.hu/todo/" + id, reqop).then(p => refresh());
+  fetch(APIURL + "todo/" + id, requestOptions).then(p => refresh());
 }
 
 function checkchange(id: any) {
   let item = toRaw(data.value.find(p => p.id == id));
-  console.log(item);
   if (item != null) {
-    const reqop = {
+    const requestOptions = {
       method: "POST",
       body: JSON.stringify(item),
       headers: { "Content-Type": "application/json" },
     };
-    fetch("http://todoapi.azitmentor.hu/todo/save", reqop).then(p => refresh());
+    fetch(APIURL + "todo/save", requestOptions).then(p => refresh());
   }
 
 }
@@ -64,19 +61,17 @@ function checkchange(id: any) {
     <div class="row">
       <div class="col">
         Search: <input type="text" v-model="searchtext" />
-        <button class="btn btn-primary" @click="search()">Search</button>
-        <div id="add">
-          New item:
-          <input type="text" id="infotext" v-model="newText">
-          Priority
-          <select id="prio" v-model="selected">
-            <option value="0">None</option>
-            <option value="1">Low</option>
-            <option value="2">Normal</option>
-            <option value="3">Urgent</option>
-          </select>
-          <button @click="addNew()" class="btn btn-primary">Hozzáad</button>
-        </div>
+        <button class="btn btn-primary mx-2" @click="search()">Search</button>
+        New item:
+        <input type="text" class="form-input" id="infotext" v-model="newText">
+        Priority
+        <select id="prio" v-model="selected">
+          <option value="0">None</option>
+          <option value="1">Low</option>
+          <option value="2">Normal</option>
+          <option value="3">Urgent</option>
+        </select>
+        <button @click="addNew()" class="btn btn-primary mx-2">Add new</button>
       </div>
     </div>
     <div class="row">

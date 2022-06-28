@@ -48,7 +48,7 @@ function loadData() {
             todoList.forEach((todoitem) => {
                 let delButton = document.createElement("button");
                 delButton.classList = "btn btn-warning";
-                delButton.innerText = "Törlés";
+                delButton.innerText = "Delete";
                 delButton.onclick = function () {
                     deleteItem(todoitem.id);
                 };
