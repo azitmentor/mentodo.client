@@ -1,19 +1,19 @@
 <div class="container my-4">
   <div class="row">
     <div class="col">
-      Keresés:<input type="text" id="searchtext" [(ngModel)]="src" (keydown)="refresh()">
-      <button (click)="refresh()" class="btn btn-primary">Keres</button>
+      Search:<input type="text" id="searchtext" [(ngModel)]="src" (keydown)="refresh()">
+      <button (click)="refresh()" class="btn btn-primary">Search</button>
       <div id="add">
-        Új tétel:
+        New item:
         <input type="text" id="infotext" [(ngModel)]="item.info">
-        Prioritás
+        Priority
         <select id="prio" [(ngModel)]="item.priority">
-          <option value="0">Nincs</option>
-          <option value="1">Ráér</option>
-          <option value="2">Normál</option>
-          <option value="3">Sűrgős</option>
+          <option value="0">None</option>
+          <option value="1">Low</option>
+          <option value="2">Normal</option>
+          <option value="3">Urgent</option>
         </select>
-        <button (click)="saveNew()" class="btn btn-primary">Hozzáad</button>
+        <button (click)="saveNew()" class="btn btn-primary">Add new</button>
       </div>
     </div>
   </div>
@@ -24,9 +24,9 @@
           <thead>
             <tr>
               <th>Id</th>
-              <th>Állapot</th>
-              <th>Teendő</th>
-              <th>Prioritás</th>
+              <th>State</th>
+              <th>Description</th>
+              <th>Priority</th>
               <th></th>
             </tr>
           </thead>
@@ -36,7 +36,7 @@
               <td><input type="checkbox" [(ngModel)]="i.done" (change)="checkchange($event,i.id)" /></td>
               <td>{{i.info}}</td>
               <td>{{i.priority}}</td>
-              <td><button class="btn btn-warning" (click)="delete(i.id)">Töröl</button></td>
+              <td><button class="btn btn-warning" (click)="delete(i.id)">Delete</button></td>
             </tr>
           </tbody>
         </table>
