@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { mydto } from "./myclass";
+import { DeleteItem, LoadItems, SaveItem } from "./service";
 
 function MainList() {
   const [itemList, setItemList] = useState<mydto[]>([]);
@@ -7,49 +8,35 @@ function MainList() {
   const [priority, setPriority] = useState("");
   const [searchText, setSearchText] = useState("");
 
-  const APIURL = "http://todoapi.azitmentor.hu/";
-
   useEffect(() => {
     refresh();
   }, []);
 
   function refresh() {
-    fetch(APIURL + "todo")
-      .then((p) => p.json())
-      .then((k: mydto[]) => {
-        k = k.filter((p) => p.info.indexOf(searchText) !== -1);
-        setItemList(k);
-      });
+    LoadItems().then((items: mydto[]) => {
+      items = items.filter(
+        (p) => p.info == null || p.info.indexOf(searchText) !== -1
+      );
+      setItemList(items);
+    });
   }
 
-  function addNew() {
-    const requestOptions = {
-      method: "POST",
-      body: JSON.stringify({ info: textInfo, priority: priority }),
-      headers: { "Content-Type": "application/json" },
-    };
-    fetch(APIURL + "todo/save", requestOptions).then((p) => refresh());
+  function addNewClick() {
+    SaveItem({ info: textInfo, priority: priority }).then((p) => refresh());
   }
 
-  function deleteItem(id: number) {
-    const requestOptions = {
-      method: "DELETE",
-    };
-    fetch(APIURL + "todo/" + id, requestOptions).then((p) => refresh());
+  function deleteClick(id: number) {
+    DeleteItem(id).then((p) => refresh());
   }
 
   function doneClick(id: number) {
     var item = itemList.find((p) => p.id === id);
     if (item != null) {
       item.done = !item.done;
-      const reqop = {
-        method: "POST",
-        body: JSON.stringify(item),
-        headers: { "Content-Type": "application/json" },
-      };
-      fetch(APIURL + "todo/save", reqop).then((p) => refresh());
+      SaveItem(item).then((p) => refresh());
     }
   }
+
   return (
     <div className="container my-4">
       <div className="row">
@@ -60,7 +47,6 @@ function MainList() {
             value={searchText}
             onChange={(p) => {
               setSearchText(p.target.value);
-              //refresh();
             }}
           />
           <button className="btn btn-primary" onClick={() => refresh()}>
@@ -83,7 +69,7 @@ function MainList() {
             <option value="2">Normal</option>
             <option value="3">Urgent</option>
           </select>
-          <button className="btn btn-primary" onClick={() => addNew()}>
+          <button className="btn btn-primary" onClick={() => addNewClick()}>
             Add new item
           </button>
         </div>
@@ -110,7 +96,7 @@ function MainList() {
                         {p.done}
                         <input
                           type="checkbox"
-                          checked={p.done}
+                          defaultChecked={p.done}
                           onClick={() => doneClick(p.id)}
                         />
                       </td>
@@ -119,7 +105,7 @@ function MainList() {
                       <td>
                         <button
                           className="btn btn-warning"
-                          onClick={() => deleteItem(p.id)}
+                          onClick={() => deleteClick(p.id)}
                         >
                           Delete
                         </button>
