@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { SaveItem, DeleteItem, LoadItems } from "./service";
 
   const APIURL = "http://todoapi.azitmentor.hu/";
 
@@ -16,39 +17,26 @@
   });
 
   async function refresh() {
-    const response = await fetch(APIURL + "todo");
-    const atm = await response.json();
+    const atm = await LoadItems();
     console.log(searchText);
     itemList = atm.filter(
       (p) => p.info == null || p.info.indexOf(searchText) !== -1
     );
   }
+
   function deleteClick(id: number) {
-    const requestOptions = {
-      method: "DELETE",
-    };
-    fetch(APIURL + "todo/" + id, requestOptions).then((p) => refresh());
+    DeleteItem(id).then((p) => refresh());
   }
 
-  function addNew() {
-    const requestOptions = {
-      method: "POST",
-      body: JSON.stringify({ info: textInfo, priority: priority }),
-      headers: { "Content-Type": "application/json" },
-    };
-    fetch(APIURL + "todo/save", requestOptions).then((p) => refresh());
+  function addNewClick() {
+    SaveItem({ info: textInfo, priority: priority }).then((p) => refresh());
   }
 
   function doneClick(id: number) {
     var item = itemList.find((p) => p.id == id);
     if (item != null) {
       item.done = !item.done;
-      const reqop = {
-        method: "POST",
-        body: JSON.stringify(item),
-        headers: { "Content-Type": "application/json" },
-      };
-      fetch(APIURL + "todo/save", reqop).then((p) => refresh());
+      SaveItem(item).then((p) => refresh());
     }
   }
 </script>
@@ -61,18 +49,18 @@
       <button class="btn btn-primary" on:click={() => refresh()}>
         Search
       </button>
-        Add new:
-        <input type="text" bind:value={textInfo} />
-        Priority
-        <select id="prio" bind:value={priority}>
-          <option value="0">None</option>
-          <option value="1">Low</option>
-          <option value="2">Normal</option>
-          <option value="3">Urgent</option>
-        </select>
-        <button class="btn btn-primary" on:click={() => addNew()}>
-          Add new item
-        </button>
+      Add new:
+      <input type="text" bind:value={textInfo} />
+      Priority
+      <select id="prio" bind:value={priority}>
+        <option value="0">None</option>
+        <option value="1">Low</option>
+        <option value="2">Normal</option>
+        <option value="3">Urgent</option>
+      </select>
+      <button class="btn btn-primary" on:click={() => addNewClick()}>
+        Add new item
+      </button>
     </div>
   </div>
   <div class="row">

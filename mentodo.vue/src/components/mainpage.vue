@@ -1,8 +1,7 @@
 <script setup lang="ts">
+import { DeleteItem, LoadItems, SaveItem } from '@/services/service';
 import { ref, onMounted, toRaw } from 'vue'
 import type { mydto } from './myclass';
-
-const APIURL = "http://todoapi.azitmentor.hu/";
 
 const data = ref<mydto[]>([]);
 
@@ -12,48 +11,35 @@ const newText = ref("");
 
 const selected = ref("");
 
-function search() {
-  refresh();
-}
-
 onMounted(() => {
   refresh();
 })
 
+function SearchClick() {
+  refresh();
+}
+
 function refresh() {
-  fetch(APIURL + "todo").then(p => p.json()).then(k => {
+  LoadItems().then(k => {
     data.value = k.filter((p: mydto) => p.info == null || p.info.indexOf(searchtext.value) !== -1)
   });
 }
 
-function addNew() {
-  const requestOptions = {
-    method: "POST",
-    body: JSON.stringify({ info: newText.value, priority: selected.value }),
-    headers: { "Content-Type": "application/json" },
-  };
-  fetch(APIURL + "todo/save", requestOptions).then(p => refresh());
+function addNewClick() {
+  SaveItem({ info: newText.value, priority: selected.value }).then(p => refresh());
 }
 
 function deleteItem(id: number) {
-  const requestOptions = {
-    method: "DELETE"
-  };
-  fetch(APIURL + "todo/" + id, requestOptions).then(p => refresh());
+  DeleteItem(id).then(p=> refresh());
 }
 
-function checkchange(id: any) {
+function statusClick(id: any) {
   let item = toRaw(data.value.find(p => p.id == id));
   if (item != null) {
-    const requestOptions = {
-      method: "POST",
-      body: JSON.stringify(item),
-      headers: { "Content-Type": "application/json" },
-    };
-    fetch(APIURL + "todo/save", requestOptions).then(p => refresh());
+    SaveItem(item).then(p => refresh());
   }
-
 }
+
 </script>
 
 <template>
@@ -61,7 +47,7 @@ function checkchange(id: any) {
     <div class="row">
       <div class="col">
         Search: <input type="text" v-model="searchtext" />
-        <button class="btn btn-primary mx-2" @click="search()">Search</button>
+        <button class="btn btn-primary mx-2" @click="SearchClick()">Search</button>
         New item:
         <input type="text" class="form-input" id="infotext" v-model="newText">
         Priority
@@ -71,7 +57,7 @@ function checkchange(id: any) {
           <option value="2">Normal</option>
           <option value="3">Urgent</option>
         </select>
-        <button @click="addNew()" class="btn btn-primary mx-2">Add new</button>
+        <button @click="addNewClick()" class="btn btn-primary mx-2">Add new</button>
       </div>
     </div>
     <div class="row">
@@ -90,10 +76,10 @@ function checkchange(id: any) {
             <tbody id="tbody1">
               <tr v-for="item in data">
                 <td>{{ item.id }}</td>
-                <td><input type="checkbox" v-model="item.done" @change="checkchange(item.id)" /></td>
+                <td><input type="checkbox" v-model="item.done" @change="statusClick(item.id)" /></td>
                 <td>{{ item.info }}</td>
                 <td>{{ item.priority }}</td>
-                <td><button class="btn btn-warning" @click="deleteItem(item.id)">Töröl</button></td>
+                <td><button class="btn btn-warning" @click="deleteItem(item.id)">Delete</button></td>
               </tr>
             </tbody>
           </table>
