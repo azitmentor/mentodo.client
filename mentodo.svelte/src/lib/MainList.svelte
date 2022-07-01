@@ -17,9 +17,8 @@
   });
 
   async function refresh() {
-    const atm = await LoadItems();
-    console.log(searchText);
-    itemList = atm.filter(
+    const items = await LoadItems();
+    itemList = items.filter(
       (p) => p.info == null || p.info.indexOf(searchText) !== -1
     );
   }
@@ -39,6 +38,7 @@
       SaveItem(item).then((p) => refresh());
     }
   }
+  
 </script>
 
 <div class="container my-4">
