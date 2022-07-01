@@ -14,24 +14,24 @@
     <div class="container my-4">
         <div class="row">
             <div class="col">
-                Search:<input type="text" id="searchtext" onkeydown="refresh()">
-                <button onclick="refresh()" class="btn btn-primary">Search</button>
-                new item:
+                Search:<input type="text" id="searchtext">
+                <button id="refresh" class="btn btn-primary">Search</button>
+                New item:
                 <input type="text" id="infotext">
                 Priority
                 <select id="prio">
-                    <option value="0">Nione</option>
+                    <option value="0">None</option>
                     <option value="1">Low</option>
                     <option value="2">Normal</option>
                     <option value="3">Urgent</option>
                 </select>
-                <button onclick="createItem()" class="btn btn-primary">Add new</button>
+                <button id="btnNew" class="btn btn-primary">Add new</button>
             </div>
         </div>
         <div class="row">
             <div class="col">
                 <div id="main">
-                    <table class="table" id="tab1">
+                    <table class="table table-striped" id="tab1">
                         <thead>
                             <tr>
                                 <th>Id</th>
@@ -50,7 +50,13 @@
             </div>
         </div>
 
-        <script src="main.js"></script>
+        <script type="module" src="main.js"></script>
+        <script type="module">
+            import { refresh, createItem } from "./main.js";
+            document.getElementById("refresh").addEventListener('click', refresh);
+            document.getElementById("btnNew").addEventListener('click', createItem);
+            document.getElementById("searchtext").addEventListener('keydown', refresh);
+        </script>
 </body>
 
 </html>

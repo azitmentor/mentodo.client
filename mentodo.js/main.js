@@ -1,6 +1,6 @@
 "use strict";
 
-const APIURL = "http://todoapi.azitmentor.hu/todo";
+import { DeleteItem, LoadItems, SaveItem } from "./dataservice.js";
 
 domReady(() => {
     loadData();
@@ -15,113 +15,81 @@ function domReady(fn) {
     }
 }
 
-function refresh() {
+export function refresh() {
     loadData();
 }
 
-function checkclick(itemid) {
-    console.log("check", itemid);
+export function createItem() {
+    let inp = document.getElementById("infotext");
+    let prio = document.getElementById("prio");
+
+    SaveItem({ info: inp.value, priority: prio.value }).then(p => {
+        loadData();
+        inp.value = "";
+    });
+}
+
+function doneClick(itemid) {
+    console.log(itemid);
     const item = todoList.find(o => o.id == itemid);
     item.done = !item.done;
-    console.log(item);
     updateItem(item);
 }
 
 let todoList;
 
 function loadData() {
-    let request = new XMLHttpRequest();
-
-    let src = document.getElementById("searchtext");
-
-    request.open("GET", APIURL, true);
-
-    request.onload = function () {
-        let data = JSON.parse(this.response);
-
-        if (request.status >= 200 && request.status < 400) {
-            let bodyNode = document.getElementById("tbody1");
-            while (bodyNode.hasChildNodes()) {
-                bodyNode.removeChild(bodyNode.lastChild);
-            }
-            todoList = data.filter(p => p.info.indexOf(src.value) != -1);
-            todoList.forEach((todoitem) => {
-                let delButton = document.createElement("button");
-                delButton.classList = "btn btn-warning";
-                delButton.innerText = "Delete";
-                delButton.onclick = function () {
-                    deleteItem(todoitem.id);
-                };
-                let row = document.createElement("tr");
-                let ch = todoitem.done ? "checked" : "";
-                row.innerHTML = "<td>" + todoitem.id + "</td><td><input type='checkbox' value='" + todoitem.done + "' onclick='checkclick(" + todoitem.id + ")'" + ch + ">" + "</td><td>" + todoitem.info + "</td><td>" + todoitem.priority + "</td>";
-                row.append(delButton);
-                bodyNode.append(row);
-                //console.log(todoitem)
-            });
-        } else {
-            console.log("error");
-        }
-    }
-
-    // Send request
-    request.send();
-
+    LoadItems().then(items => buildTable(items));
 }
 
-function createItem() {
-
-    let inp = document.getElementById("infotext");
-    let prio = document.getElementById("prio");
-    console.log(inp.value);
-
-    let request = new XMLHttpRequest();
-    request.open("POST", APIURL + "/save", true);
-    request.setRequestHeader("Content-Type", "application/json");
-    request.onload = function () {
-        if (request.status >= 200 && request.status < 400) {
-            loadData();
-        } else {
-            console.log("error");
-        }
+function buildTable(items) {
+    let src = document.getElementById("searchtext");
+    let bodyNode = document.getElementById("tbody1");
+    while (bodyNode.hasChildNodes()) {
+        bodyNode.removeChild(bodyNode.lastChild);
     }
+    todoList = items.filter(p => p.info.indexOf(src.value) != -1);
+    todoList.forEach((todoitem) => {
+        const delButton = document.createElement("button");
+        delButton.classList = "btn btn-warning";
+        delButton.innerText = "Delete";
+        delButton.addEventListener('click', (e, ev) => deleteItem(todoitem.id));
 
-    // Send request
-    let reqText = JSON.stringify({ info: inp.value, priority: prio.value });
-    request.send(reqText);
-    inp.value = "";
+        const inputCheckbox = document.createElement("input");
+        inputCheckbox.type = "checkbox";
+        inputCheckbox.checked = todoitem.done;
+        inputCheckbox.addEventListener("click", (e, ev) => doneClick(todoitem.id));
+
+        let row = document.createElement("tr");
+        let cell = document.createElement("td");
+        cell.innerText = todoitem.id;
+        row.append(cell);
+
+        cell = document.createElement("td");
+        cell.append(inputCheckbox);
+        row.append(cell);
+
+        cell = document.createElement("td");
+        cell.innerText = todoitem.info;
+        row.append(cell);
+
+        cell = document.createElement("td");
+        cell.innerText = todoitem.priority;
+        row.append(cell);
+
+        cell = document.createElement("td");
+        cell.append(delButton);
+        row.append(cell);
+
+        bodyNode.append(row);
+    });
+
 }
 
 function updateItem(item) {
-    let request = new XMLHttpRequest();
-    request.open("POST", APIURL + "/save", true);
-    request.setRequestHeader("Content-Type", "application/json");
-    request.onload = function () {
-        if (request.status >= 200 && request.status < 400) {
-            loadData();
-        } else {
-            console.log("error");
-        }
-    }
-
-    // Send request
-    let reqText = JSON.stringify(item);
-    request.send(reqText);
+    SaveItem(item).then(o => loadData());
 }
 
 function deleteItem(id) {
-    let request = new XMLHttpRequest();
-
-    request.open("DELETE", APIURL + "/" + id, true);
-
-    request.onload = function () {
-        if (request.status >= 200 && request.status < 400) {
-            loadData();
-        } else {
-            console.log("error");
-        }
-    }
-
-    // Send request
-    request.send();
+    DeleteItem(id).then(o => loadData());
 }
