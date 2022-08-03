@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DataserviceService } from './dataservice.service';
 import { todoinfo } from './todoinfo.model';
 
@@ -7,12 +7,14 @@ import { todoinfo } from './todoinfo.model';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.sass'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   items: todoinfo[] = [];
   info: string = '';
   item: todoinfo = new todoinfo();
   src: string = '';
-  constructor(private data: DataserviceService) {
+  constructor(private data: DataserviceService) {}
+
+  ngOnInit(): void {
     this.refresh();
   }
 
