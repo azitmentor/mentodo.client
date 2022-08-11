@@ -11,7 +11,7 @@ export class AppComponent implements OnInit {
   items: todoinfo[] = [];
   info: string = '';
   item: todoinfo = new todoinfo();
-  src: string = '';
+  searchtext: string = '';
   constructor(private data: DataserviceService) {}
 
   ngOnInit(): void {
@@ -24,7 +24,8 @@ export class AppComponent implements OnInit {
       .subscribe(
         (l) =>
           (this.items = l.filter(
-            (p: todoinfo) => p.info == null || p.info.indexOf(this.src) != -1
+            (p: todoinfo) =>
+              p.info == null || p.info.indexOf(this.searchtext) != -1
           ))
       );
   }
@@ -38,10 +39,8 @@ export class AppComponent implements OnInit {
   }
 
   checkchange(event: any, id: number) {
-    console.log(event, id);
     let item = this.items.find((p) => p.id == id);
     if (item != null) {
-      //item.done = !item.done;
       this.data.saveItem(item).subscribe((o) => this.refresh());
     }
   }

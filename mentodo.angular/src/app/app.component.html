@@ -1,7 +1,7 @@
 <div class="container my-4">
   <div class="row">
     <div class="col">
-      Search:<input type="text" id="searchtext" [(ngModel)]="src" (keydown)="refresh()">
+      Search:<input type="text" id="searchtext" [(ngModel)]="searchtext" (keydown)="refresh()">
       <button (click)="refresh()" class="btn btn-primary">Search</button>
       <div id="add">
         New item:
@@ -31,12 +31,12 @@
             </tr>
           </thead>
           <tbody id="tbody1">
-            <tr *ngFor="let i of items">
-              <td>{{i.id}}</td>
-              <td><input type="checkbox" [(ngModel)]="i.done" (change)="checkchange($event,i.id)" /></td>
-              <td>{{i.info}}</td>
-              <td>{{i.priority}}</td>
-              <td><button class="btn btn-warning" (click)="delete(i.id)">Delete</button></td>
+            <tr *ngFor="let item of items">
+              <td>{{item.id}}</td>
+              <td><input type="checkbox" [(ngModel)]="item.done" (change)="checkchange($event,item.id)" /></td>
+              <td>{{item.info}}</td>
+              <td>{{item.priority}}</td>
+              <td><button class="btn btn-warning" (click)="delete(item.id)">Delete</button></td>
             </tr>
           </tbody>
         </table>
